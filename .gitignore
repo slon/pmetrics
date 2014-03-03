@@ -1,0 +1,8 @@
+*~
+*.pyc
+*.a
+*.o
+*.so
+*.os
+.sconsign.dblite
+test/run_ut
