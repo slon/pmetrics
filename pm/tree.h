@@ -24,7 +24,6 @@ struct tree_printer_t {
 
 struct tree_leaf_t {
 	virtual void print(tree_printer_t* printer) = 0;
-	virtual ~tree_leaf_t() {}
 };
 
 class tree_branch_t {
