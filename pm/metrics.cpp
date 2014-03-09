@@ -79,6 +79,16 @@ struct timer_impl_t : public tree_leaf_t {
 	histogram_impl_t five_min_timings;
 };
 
+timer_context_t::timer_context_t(timer_t* timer) : timer_(timer), start_time_(timer->start()) {}
+
+void timer_context_t::finish() {
+	if(timer_) {
+		timer_->finish(start_time_);
+		timer_ = nullptr;
+	}
+}
+
+
 time_point_t timer_t::start() {
 	if(impl_) {
 		impl_->active_count += 1;
