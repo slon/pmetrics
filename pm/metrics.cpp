@@ -18,21 +18,15 @@ struct counter_impl_t : public tree_leaf_t {
 };
 
 void counter_t::inc(int64_t amount) {
-	if(impl_) {
-		impl_->value += amount;
-	}
+	if(impl_) impl_->value += amount;
 }
 
 void counter_t::dec(int64_t amount) {
-	if(impl_) {
-		impl_->value -= amount;
-	}
+	if(impl_) impl_->value -= amount;
 }
 
 void counter_t::set(int64_t value) {
-	if(impl_) {
-		impl_->value = value;
-	}
+	if(impl_) impl_->value = value;
 }
 
 struct meter_impl_t : public tree_leaf_t {
@@ -69,15 +63,37 @@ struct histogram_impl_t : public tree_leaf_t {
 	std::vector<decaying_count_t> histogram;
 };
 
+void histogram_t::update(int64_t value) {
+	if(impl_) {
+		// TODO
+	}
+}
+
 struct timer_impl_t : public tree_leaf_t {
 	virtual void print(tree_printer_t* printer) {
 
 	}
 
-	counter_impl_t active_count;
+	std::atomic<int64_t> active_count;
 	meter_impl_t rate;
 	histogram_impl_t five_min_timings;
 };
+
+time_point_t timer_t::start() {
+	if(impl_) {
+		impl_->active_count += 1;
+
+		return std::chrono::system_clock::now();
+	} else {
+		return time_point_t();
+	}
+}
+
+void timer_t::finish(time_point_t start_time) {
+	if(impl_) {
+		impl_->active_count -= 1;
+	}
+}
 
 metric_registry_t::metric_registry_t() : tree_(nullptr) {}
 metric_registry_t::metric_registry_t(std::shared_ptr<tree_branch_t> branch) : tree_(branch) {}

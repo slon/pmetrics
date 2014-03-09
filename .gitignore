@@ -5,4 +5,4 @@
 *.so
 *.os
 .sconsign.dblite
-test/run_ut
+run_ut
