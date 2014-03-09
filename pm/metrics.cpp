@@ -1,28 +1,19 @@
 #include <pm/metrics.h>
 
+#include <mutex>
 #include <atomic>
+#include <map>
+
+#include <pm/tree.h>
 
 namespace pm {
 
-struct metric_printer_t {
-	void print(double value);
-	void print(int64_t value);
-	void print(const std::string& key, double value);
-	void print(const std::string& key, int64_t value);
-};
-
-struct metric_impl_t {
-	virtual void print(metric_printer_t* printer) = 0;
-
-	virtual ~metric_impl_t() {}
-};
-
-struct gauge_impl_t : public metric_impl_t {
-	virtual void print(metric_printer_t* printer) {
+struct gauge_impl_t : public tree_leaf_t {
+	virtual void print(tree_printer_t* printer) {
 		if(int_gauge_) {
-			printer->print(int_gauge_());
+			printer->value(int_gauge_());
 		} else {
-			printer->print(double_gauge_());
+			printer->value(double_gauge_());
 		}
 	}
 
@@ -30,36 +21,39 @@ struct gauge_impl_t : public metric_impl_t {
 	std::function<double()> double_gauge_;
 };
 
-struct counter_impl_t : public metric_impl_t {
-	virtual void print(metric_printer_t* printer) {
-		printer->print(value_);
+struct counter_impl_t : public tree_leaf_t {
+	virtual void print(tree_printer_t* printer) {
+		printer->value(value_);
 	}
 
 	std::atomic<int64_t> value_;
 };
 
-struct meter_impl_t : public metric_impl_t {
-	virtual void print(metric_printer_t* printer) {
+struct meter_impl_t : public tree_leaf_t {
+	virtual void print(tree_printer_t* printer) {
 
 	}
 };
 
-struct histogram_impl_t : public metric_impl_t {
-	virtual void print(metric_printer_t* printer) {
+struct histogram_impl_t : public tree_leaf_t {
+	virtual void print(tree_printer_t* printer) {
 
 	}
 };
 
-struct timer_impl_t : public metric_impl_t {
-	virtual void print(metric_printer_t* printer) {
+struct timer_impl_t : public tree_leaf_t {
+	virtual void print(tree_printer_t* printer) {
 
 	}
 };
 
-struct health_check_impl_t : public metric_impl_t {
-	virtual void print(metric_printer_t* printer) {
+struct health_check_impl_t : public tree_leaf_t {
+	virtual void print(tree_printer_t* printer) {
 
 	}
+};
+
+struct metric_registry_impl_t : public tree_branch_t {
 };
 
 } // namespace pm

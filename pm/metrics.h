@@ -90,10 +90,12 @@ struct health_check_t {
 template<class metric_t>
 class named_t {};
 
+class tree_branch_t;
+
 // collection of metrics
 class metric_registry_t {
 public:
-	metric_registry_t with_prefix(const std::string& prefix);
+	metric_registry_t subtree(const std::string& prefix);
 
 	counter_t counter(const std::string& name);
 	meter_t meter(const std::string& name);
@@ -109,10 +111,7 @@ public:
 	named_t<metric_t> named(const std::string& name);
 
 private:
-	class metrics_registry_impl_t;
-
-	std::string prefix_;
-	std::shared_ptr<metrics_registry_impl_t> impl_;
+	std::shared_ptr<tree_branch_t> tree_;
 };
 
 metric_registry_t get_root();
