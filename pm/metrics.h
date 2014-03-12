@@ -26,7 +26,6 @@ struct counter_t {
 	std::shared_ptr<counter_impl_t> impl_;
 };
 
-
 // measure rate of events over time e.g. RPS
 struct meter_t {
 	void mark();
@@ -34,7 +33,6 @@ struct meter_t {
 	// private
 	std::shared_ptr<meter_impl_t> impl_;
 };
-
 
 // measure statistical distribution of data
 struct histogram_t {
@@ -74,12 +72,15 @@ template<class metric_t>
 class named_t {};
 
 class tree_branch_t;
+class tree_printer_t;
 
 // collection of metrics
 class metric_registry_t {
 public:
 	metric_registry_t();
 	metric_registry_t(std::shared_ptr<tree_branch_t> branch);
+
+	static metric_registry_t get_root();
 
 	metric_registry_t subtree(const std::string& prefix);
 
@@ -91,12 +92,14 @@ public:
 	template<class metric_t>
 	named_t<metric_t> named(const std::string& name);
 
-	static metric_registry_t get_root();
+	void print(tree_printer_t* printer);
 
 private:
 	std::shared_ptr<tree_branch_t> tree_;
 
 	static std::shared_ptr<tree_branch_t> ROOT;
 };
+
+inline metric_registry_t get_root() { return metric_registry_t::get_root(); }
 
 } // namespace pm

@@ -116,6 +116,25 @@ metric_registry_t metric_registry_t::subtree(const std::string& name) {
 	}
 }
 
+counter_t metric_registry_t::counter(const std::string& name) {
+	if(tree_) {
+		auto counter_impl = std::make_shared<counter_impl_t>();
+		tree_->add_leaf(name, counter_impl);
+		counter_t counter;
+		counter.impl_ = counter_impl;
+		return counter;
+	} else {
+		return counter_t();
+	}
+}
+
+void metric_registry_t::print(tree_printer_t* printer) {
+	if(tree_) {
+		tree_->print(printer);
+	}
+}
+
+
 std::shared_ptr<tree_branch_t> metric_registry_t::ROOT = std::make_shared<tree_branch_t>();
 
 metric_registry_t metric_registry_t::get_root() {
