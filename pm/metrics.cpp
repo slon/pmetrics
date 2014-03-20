@@ -33,20 +33,22 @@ struct meter_impl_t : public tree_leaf_t {
 	virtual void print(tree_printer_t* printer) {
 		printer->start_node();
 
+		auto now = std::chrono::system_clock::now();
+
 		printer->child("one_sec");
-		printer->value(one_sec.value());
+		printer->value(one_sec.value(now));
 
 		printer->child("one_min");
-		printer->value(one_min.value());
+		printer->value(one_min.value(now));
 
 		printer->child("one_hour");
-		printer->value(one_hour.value());
+		printer->value(one_hour.value(now));
 
 		printer->end_node();
 	}
 
-	double_buffer_count_t one_sec;
-	decaying_count_t one_min, one_hour;
+	double_buffer_counter_t one_sec;
+	decaying_counter_t one_min, one_hour;
 };
 
 void meter_t::mark() {
@@ -60,7 +62,7 @@ struct histogram_impl_t : public tree_leaf_t {
 
 	}
 
-	std::vector<decaying_count_t> histogram;
+	std::vector<decaying_counter_t> histogram;
 };
 
 void histogram_t::update(int64_t value) {

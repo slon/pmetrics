@@ -4,12 +4,10 @@
 #include <memory>
 #include <cstdint>
 #include <functional>
-#include <chrono>
+
+#include <pm/time.h>
 
 namespace pm {
-
-typedef std::chrono::system_clock::duration duration_t;
-typedef std::chrono::system_clock::time_point time_point_t;
 
 struct counter_impl_t;
 struct meter_impl_t;
