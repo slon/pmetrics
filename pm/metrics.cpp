@@ -47,13 +47,22 @@ struct meter_impl_t : public tree_leaf_t {
 		printer->end_node();
 	}
 
+    virtual void mark() {
+        auto now = std::chrono::system_clock::now();
+
+        one_sec.mark(now);
+        one_min.mark(now);
+        quarter_hour.mark(now);
+        one_hour.mark(now);
+    }
+
 	double_buffer_counter_t one_sec;
-	decaying_counter_t one_min, one_hour;
+	decaying_counter_t one_min, quarter_hour, one_hour;
 };
 
 void meter_t::mark() {
 	if(impl_) {
-		// TODO update
+	    impl_->mark();
 	}
 }
 
