@@ -61,33 +61,33 @@ private:
 
 class decaying_counter_t {
 public:
-    explicit decaying_counter_t (double decay_factor) :
-        decay_factor_ (decay_factor),
-        value_(0),
-        last_(std::chrono::system_clock::now())
-    {}
+	explicit decaying_counter_t (double decay_factor) :
+		decay_factor_ (decay_factor),
+		value_(0),
+		last_(std::chrono::system_clock::now())
+	{}
 
 	uint64_t value (time_point_t at) {
-        std::lock_guard<spinlock_t> guard(lock_);
-        decay(at);
-        return value_;
-    }
+		std::lock_guard<spinlock_t> guard(lock_);
+		decay(at);
+		return value_;
+	}
 
-    void mark (time_point_t at) {
-        std::lock_guard<spinlock_t> guard(lock_);
-        decay(at);
-        value_ += 1;
-    }
+	void mark (time_point_t at) {
+		std::lock_guard<spinlock_t> guard(lock_);
+		decay(at);
+		value_ += 1;
+	}
 
 private:
-    void decay(time_point_t at) {
-        value_ *= exp(- decay_factor_ * double(std::chrono::duration_cast<std::chrono::seconds>(at - last_).count()));
-    }
+	void decay(time_point_t at) {
+		value_ *= exp(- decay_factor_ * double(std::chrono::duration_cast<std::chrono::seconds>(at - last_).count()));
+	}
 
-    double decay_factor_;
-    uint64_t value_;
+	double decay_factor_;
+	uint64_t value_;
 
-    time_point_t last_;
+	time_point_t last_;
 
 	spinlock_t lock_;
 };
