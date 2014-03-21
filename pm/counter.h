@@ -83,11 +83,12 @@ private:
         if (at < last_) return;
         auto age = std::chrono::duration_cast<std::chrono::seconds>(at - last_)
                        .count();
+        last_ = at;
         value_ *= exp(-decay_factor_ * double(age));
     }
 
     double decay_factor_;
-    uint64_t value_;
+    double value_;
 
     time_point_t last_;
 

@@ -28,7 +28,17 @@ TEST(double_buffer_counter_test_t, full) {
     EXPECT_EQ(1, c.value(now + 3 * window_size));
 }
 
-TEST(exponential_decay_counter_test_t, full) {
+TEST(exponential_decay_counter_test_t, simple) {
+    auto now = std::chrono::system_clock::now();
+
+    auto interval = std::chrono::seconds(1);
+    decaying_counter_t c(interval);
+
+    c.mark(now);
+    EXPECT_EQ(c.value(now), 1);
+}
+
+TEST(exponential_decay_counter_test_t, decay) {
     auto now = std::chrono::system_clock::now();
 
     auto interval = std::chrono::seconds(3);
@@ -39,5 +49,10 @@ TEST(exponential_decay_counter_test_t, full) {
     c.mark(now + std::chrono::seconds(2));
     c.mark(now + std::chrono::seconds(3));
     c.mark(now + std::chrono::seconds(4));
-    EXPECT_NEAR(c.value(now), 3, 0.1);
+    c.mark(now + std::chrono::seconds(5));
+    c.mark(now + std::chrono::seconds(6));
+    c.mark(now + std::chrono::seconds(7));
+    c.mark(now + std::chrono::seconds(8));
+
+    EXPECT_NEAR(c.value(now + std::chrono::seconds(8)), 3, 0.6);
 }
