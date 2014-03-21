@@ -34,3 +34,10 @@ TEST(metrics_test_t, counter) {
 
     ASSERT_EQ("g.test.counter 5 100\n", p.result());
 }
+
+TEST(metrics_test_t, meter) {
+    meter_t m = get_root().subtree("test").meter("meter");
+    m.mark();
+    m.mark();
+    m.mark();
+}

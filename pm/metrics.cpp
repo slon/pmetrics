@@ -28,6 +28,13 @@ void counter_t::set(int64_t value) {
 }
 
 struct meter_impl_t : public tree_leaf_t {
+
+    meter_impl_t()
+        : one_sec(std::chrono::seconds(1)),
+          one_min(std::chrono::seconds(60)),
+          quarter_hour(std::chrono::seconds(15 * 60)),
+          one_hour(std::chrono::seconds(60 * 60)) {}
+
     virtual void print(tree_printer_t* printer) {
         printer->start_node();
 
@@ -131,6 +138,18 @@ counter_t metric_registry_t::counter(const std::string& name) {
         return counter;
     } else {
         return counter_t();
+    }
+}
+
+meter_t metric_registry_t::meter(const std::string& name) {
+    if (tree_) {
+        auto meter_impl = std::make_shared<meter_impl_t>();
+        tree_->add_leaf(name, meter_impl);
+        meter_t meter;
+        meter.impl_ = meter_impl;
+        return meter;
+    } else {
+        return meter_t();
     }
 }
 
