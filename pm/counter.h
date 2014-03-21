@@ -61,8 +61,8 @@ private:
 
 class decaying_counter_t {
 public:
-	explicit decaying_counter_t (double decay_factor) :
-		decay_factor_ (decay_factor),
+	explicit decaying_counter_t (std::chrono::seconds interval) :
+		decay_factor_ (double(1) / double(interval.count())),
 		value_(0),
 		last_(std::chrono::system_clock::now())
 	{}
@@ -81,7 +81,9 @@ public:
 
 private:
 	void decay(time_point_t at) {
-		value_ *= exp(- decay_factor_ * double(std::chrono::duration_cast<std::chrono::seconds>(at - last_).count()));
+        if (at < last_) return;
+        auto age = std::chrono::duration_cast<std::chrono::seconds>(at - last_).count();
+		value_ *= exp(- decay_factor_ * double(age));
 	}
 
 	double decay_factor_;

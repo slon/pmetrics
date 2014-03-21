@@ -1,3 +1,4 @@
+#include <cmath>
 #include <pm/counter.h>
 
 #include <gtest/gtest.h>
@@ -25,4 +26,18 @@ TEST(double_buffer_counter_test_t, full) {
 
 	EXPECT_EQ(3, c.value(now + 3 * window_size / 2));
 	EXPECT_EQ(1, c.value(now + 3 * window_size));
+}
+
+TEST(exponential_decay_counter_test_t, full) {
+    auto now = std::chrono::system_clock::now();
+
+	auto interval = std::chrono::seconds(3);
+    decaying_counter_t c(interval);
+
+    c.mark(now);
+    c.mark(now + std::chrono::seconds(1));
+    c.mark(now + std::chrono::seconds(2));
+    c.mark(now + std::chrono::seconds(3));
+    c.mark(now + std::chrono::seconds(4));
+    EXPECT_NEAR(c.value(now), 3, 0.1);
 }
