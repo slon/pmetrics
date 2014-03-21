@@ -37,7 +37,16 @@ TEST(metrics_test_t, counter) {
 
 TEST(metrics_test_t, meter) {
     meter_t m = get_root().subtree("test").meter("meter");
+
     m.mark();
-    m.mark();
-    m.mark();
+
+    graphite_printer_t p("g", 100);
+    get_root().print(&p);
+
+    ASSERT_EQ(
+        "g.test.meter.one_sec 0 100\n"
+        "g.test.meter.one_min 1 100\n"
+        "g.test.meter.quarter_hour 1 100\n"
+        "g.test.meter.one_hour 1 100\n",
+        p.result());
 }
