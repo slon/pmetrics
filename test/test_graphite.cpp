@@ -5,30 +5,29 @@
 using namespace pm;
 
 TEST(graphite_printer_test_t, empty) {
-	graphite_printer_t p("one_min.yandex");
+    graphite_printer_t p("one_min.yandex");
 
-	ASSERT_EQ("", p.result());
+    ASSERT_EQ("", p.result());
 }
 
 TEST(graphite_printer_test_t, simple) {
-	graphite_printer_t p("one_min.yandex", /* timestamp = */15);
+    graphite_printer_t p("one_min.yandex", /* timestamp = */ 15);
 
-	p.start_node();
+    p.start_node();
 
-	p.child("foo");
-	p.value((int64_t)10);
+    p.child("foo");
+    p.value((int64_t)10);
 
-	p.child("bar");
-	p.start_node();
-	p.child("value");
-	p.value(0.5);
-	p.end_node();
+    p.child("bar");
+    p.start_node();
+    p.child("value");
+    p.value(0.5);
+    p.end_node();
 
-	p.end_node();
+    p.end_node();
 
-	ASSERT_EQ(
-		"one_min.yandex.foo 10 15\n"
-		"one_min.yandex.bar.value 0.5 15\n",
-		p.result()
-	);
+    ASSERT_EQ(
+        "one_min.yandex.foo 10 15\n"
+        "one_min.yandex.bar.value 0.5 15\n",
+        p.result());
 }
