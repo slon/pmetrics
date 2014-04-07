@@ -1,0 +1,11 @@
+Source: libpmetrics
+Priority: extra
+Maintainer: Fedor Korotky <prime@yandex-team.ru>
+Build-Depends: debhelper (>= 8.0.0),
+			   scons (>= 2.0.0),
+			   yabs-gmock-dev
+Standards-Version: 3.9.2
+
+Package: libpmetrics-dev
+Architecture: amd64
+Description: Metrics library
