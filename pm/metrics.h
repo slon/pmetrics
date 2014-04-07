@@ -87,8 +87,7 @@ public:
 
     counter_t counter(const std::string& name);
     meter_t meter(const std::string& name);
-    histogram_t histogram(const std::string& name, int min, int max,
-                          int accuracy);
+    histogram_t histogram(const std::string& name, int min, int max);
     timer_t timer(const std::string& name);
 
     template <class metric_t>

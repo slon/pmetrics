@@ -28,7 +28,6 @@ void counter_t::set(int64_t value) {
 }
 
 struct meter_impl_t : public tree_leaf_t {
-
     meter_impl_t()
         : one_sec(std::chrono::seconds(1)),
           one_min(std::chrono::seconds(60)),
@@ -74,24 +73,63 @@ void meter_t::mark() {
     }
 }
 
-struct histogram_impl_t : public tree_leaf_t {
-    virtual void print(tree_printer_t* printer) {}
+static std::vector<double> QUANTILES = { .5, .8, .9, .95, .99 };
 
-    std::vector<decaying_counter_t> histogram;
+struct histogram_impl_t : public tree_leaf_t {
+    histogram_impl_t(int min, int max)
+        : histogram_five_min(std::chrono::minutes(5), linear_mapping_t(min, max, 1000)) {}
+
+    virtual void print(tree_printer_t* printer) {
+        std::vector<double> qvalues;
+
+        histogram_five_min.get_quantiles(std::chrono::system_clock::now(), QUANTILES, &qvalues);
+
+        printer->start_node();
+        printer->child("q50");
+        printer->value(qvalues[0]);
+        printer->child("q80");
+        printer->value(qvalues[1]);
+        printer->child("q90");
+        printer->value(qvalues[2]);
+        printer->child("q95");
+        printer->value(qvalues[3]);
+        printer->child("q99");
+        printer->value(qvalues[4]);
+        printer->end_node();
+    }
+
+    void update(double value) {
+        histogram_five_min.update(std::chrono::system_clock::now(), value);
+    }
+
+    histogram_counter_t histogram_five_min;
 };
 
 void histogram_t::update(int64_t value) {
     if (impl_) {
-        // TODO
+        impl_->update(value);
     }
 }
 
 struct timer_impl_t : public tree_leaf_t {
-    virtual void print(tree_printer_t* printer) {}
+    timer_impl_t() : timings(0, 1000) {}
+
+    virtual void print(tree_printer_t* printer) {
+        printer->start_node();
+        printer->child("active");
+        printer->value(active_count);
+
+        printer->child("rate");
+        rate.print(printer);
+
+        printer->child("timings");
+        timings.print(printer);
+        printer->end_node();
+    }
 
     std::atomic<int64_t> active_count;
     meter_impl_t rate;
-    histogram_impl_t five_min_timings;
+    histogram_impl_t timings;
 };
 
 timer_context_t::timer_context_t(timer_t* timer)
@@ -107,6 +145,7 @@ void timer_context_t::finish() {
 time_point_t timer_t::start() {
     if (impl_) {
         impl_->active_count += 1;
+        impl_->rate.mark();
 
         return std::chrono::system_clock::now();
     } else {
@@ -117,6 +156,9 @@ time_point_t timer_t::start() {
 void timer_t::finish(time_point_t start_time) {
     if (impl_) {
         impl_->active_count -= 1;
+
+        auto now = time_point_t(std::chrono::system_clock::now());
+        impl_->timings.update(std::chrono::duration_cast<std::chrono::milliseconds>(now - start_time).count());
     }
 }
 
@@ -155,6 +197,31 @@ meter_t registry_t::meter(const std::string& name) {
         return meter_t();
     }
 }
+
+histogram_t registry_t::histogram(const std::string& name, int min, int max) {
+    if (tree_) {
+        auto hist_impl = std::make_shared<histogram_impl_t>(min, max);
+        tree_->add_leaf(name, hist_impl);
+        histogram_t hist;
+        hist.impl_ = hist_impl;
+        return hist;
+    } else {
+        return histogram_t();
+    }
+}
+
+timer_t registry_t::timer(const std::string& name) {
+    if (tree_) {
+        auto timer_impl = std::make_shared<timer_impl_t>();
+        tree_->add_leaf(name, timer_impl);
+        timer_t timer;
+        timer.impl_ = timer_impl;
+        return timer;
+    } else {
+        return timer_t();
+    }
+}
+
 
 void registry_t::print(tree_printer_t* printer) {
     if (tree_) {

@@ -50,3 +50,43 @@ TEST(metrics_test_t, meter) {
         "g.test.meter.one_hour 1 100\n",
         p.result());
 }
+
+TEST(metrics_test_t, timer) {
+    pm::timer_t t = get_root().subtree("test").timer("timer");
+
+    auto token = t.time();
+
+    graphite_printer_t p("g", 100);
+    get_root().print(&p);
+
+    ASSERT_EQ(
+        "g.test.timer.active 1 100\n"
+        "g.test.timer.rate.one_sec 0 100\n"
+        "g.test.timer.rate.one_min 1 100\n"
+        "g.test.timer.rate.quarter_hour 1 100\n"
+        "g.test.timer.rate.one_hour 1 100\n"
+        "g.test.timer.timings.q50 0 100\n"
+        "g.test.timer.timings.q80 0 100\n"
+        "g.test.timer.timings.q90 0 100\n"
+        "g.test.timer.timings.q95 0 100\n"
+        "g.test.timer.timings.q99 0 100\n",
+        p.result());
+
+    token.finish();
+
+    graphite_printer_t p2("g", 100);
+    get_root().print(&p2);
+
+    ASSERT_EQ(
+        "g.test.timer.active 0 100\n"
+        "g.test.timer.rate.one_sec 0 100\n"
+        "g.test.timer.rate.one_min 1 100\n"
+        "g.test.timer.rate.quarter_hour 1 100\n"
+        "g.test.timer.rate.one_hour 1 100\n"
+        "g.test.timer.timings.q50 1 100\n"
+        "g.test.timer.timings.q80 1 100\n"
+        "g.test.timer.timings.q90 1 100\n"
+        "g.test.timer.timings.q95 1 100\n"
+        "g.test.timer.timings.q99 1 100\n",
+        p2.result());
+}
