@@ -76,14 +76,14 @@ class tree_branch_t;
 class tree_printer_t;
 
 // collection of metrics
-class metric_registry_t {
+class registry_t {
 public:
-    metric_registry_t();
-    metric_registry_t(std::shared_ptr<tree_branch_t> branch);
+    registry_t();
+    registry_t(std::shared_ptr<tree_branch_t> branch);
 
-    static metric_registry_t get_root();
+    static registry_t get_root();
 
-    metric_registry_t subtree(const std::string& prefix);
+    registry_t subtree(const std::string& prefix);
 
     counter_t counter(const std::string& name);
     meter_t meter(const std::string& name);
@@ -102,6 +102,6 @@ private:
     static std::shared_ptr<tree_branch_t> ROOT;
 };
 
-inline metric_registry_t get_root() { return metric_registry_t::get_root(); }
+inline registry_t get_root() { return registry_t::get_root(); }
 
 }  // namespace pm

@@ -120,19 +120,19 @@ void timer_t::finish(time_point_t start_time) {
     }
 }
 
-metric_registry_t::metric_registry_t() : tree_(nullptr) {}
-metric_registry_t::metric_registry_t(std::shared_ptr<tree_branch_t> branch)
+registry_t::registry_t() : tree_(nullptr) {}
+registry_t::registry_t(std::shared_ptr<tree_branch_t> branch)
     : tree_(branch) {}
 
-metric_registry_t metric_registry_t::subtree(const std::string& name) {
+registry_t registry_t::subtree(const std::string& name) {
     if (tree_) {
-        return metric_registry_t(tree_->get_branch(name));
+        return registry_t(tree_->get_branch(name));
     } else {
-        return metric_registry_t(nullptr);
+        return registry_t(nullptr);
     }
 }
 
-counter_t metric_registry_t::counter(const std::string& name) {
+counter_t registry_t::counter(const std::string& name) {
     if (tree_) {
         auto counter_impl = std::make_shared<counter_impl_t>();
         tree_->add_leaf(name, counter_impl);
@@ -144,7 +144,7 @@ counter_t metric_registry_t::counter(const std::string& name) {
     }
 }
 
-meter_t metric_registry_t::meter(const std::string& name) {
+meter_t registry_t::meter(const std::string& name) {
     if (tree_) {
         auto meter_impl = std::make_shared<meter_impl_t>();
         tree_->add_leaf(name, meter_impl);
@@ -156,17 +156,16 @@ meter_t metric_registry_t::meter(const std::string& name) {
     }
 }
 
-void metric_registry_t::print(tree_printer_t* printer) {
+void registry_t::print(tree_printer_t* printer) {
     if (tree_) {
         tree_->print(printer);
     }
 }
 
-std::shared_ptr<tree_branch_t> metric_registry_t::ROOT =
-    std::make_shared<tree_branch_t>();
+std::shared_ptr<tree_branch_t> registry_t::ROOT = std::make_shared<tree_branch_t>();
 
-metric_registry_t metric_registry_t::get_root() {
-    return metric_registry_t(ROOT);
+registry_t registry_t::get_root() {
+    return registry_t(ROOT);
 }
 
 }  // namespace pm
