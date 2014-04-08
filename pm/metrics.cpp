@@ -43,13 +43,13 @@ struct meter_impl_t : public tree_leaf_t {
         printer->value(one_sec.value(now));
 
         printer->child("one_min");
-        printer->value(one_min.value(now));
+        printer->value(one_min.value(now) / 60.);
 
         printer->child("quarter_hour");
-        printer->value(quarter_hour.value(now));
+        printer->value(quarter_hour.value(now) / 15. / 60.);
 
         printer->child("one_hour");
-        printer->value(one_hour.value(now));
+        printer->value(one_hour.value(now) / 60. / 60.);
 
         printer->end_node();
     }
