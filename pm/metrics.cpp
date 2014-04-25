@@ -3,6 +3,7 @@
 #include <mutex>
 #include <atomic>
 #include <map>
+#include <iostream>
 
 #include <pm/tree.h>
 #include <pm/counter.h>

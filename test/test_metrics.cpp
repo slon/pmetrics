@@ -2,7 +2,9 @@
 #include <pm/graphite.h>
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
+using namespace ::testing;
 using namespace pm;
 
 TEST(metrics_test_t, default_constructed_metrics_do_nothing) {
@@ -35,6 +37,8 @@ TEST(metrics_test_t, counter) {
     ASSERT_EQ("g.test.counter 5 100\n", p.result());
 }
 
+static const std::string FLOAT_RE = "[0-9]+(.[0-9]+)?";
+
 TEST(metrics_test_t, meter) {
     meter_t m = get_root().subtree("test").meter("meter");
 
@@ -43,12 +47,12 @@ TEST(metrics_test_t, meter) {
     graphite_printer_t p("g", 100);
     get_root().print(&p);
 
-    ASSERT_EQ(
-        "g.test.meter.one_sec 0 100\n"
-        "g.test.meter.one_min 1 100\n"
-        "g.test.meter.quarter_hour 1 100\n"
-        "g.test.meter.one_hour 1 100\n",
-        p.result());
+    EXPECT_THAT(p.result(), MatchesRegex(
+        "g.test.meter.one_sec " + FLOAT_RE + " 100\n"
+        "g.test.meter.one_min " + FLOAT_RE + " 100\n"
+        "g.test.meter.quarter_hour " + FLOAT_RE + " 100\n"
+        "g.test.meter.one_hour " + FLOAT_RE + " 100\n"
+    ));
 }
 
 TEST(metrics_test_t, timer) {
@@ -59,34 +63,34 @@ TEST(metrics_test_t, timer) {
     graphite_printer_t p("g", 100);
     get_root().print(&p);
 
-    ASSERT_EQ(
+    EXPECT_THAT(p.result(), MatchesRegex(
         "g.test.timer.active 1 100\n"
-        "g.test.timer.rate.one_sec 0 100\n"
-        "g.test.timer.rate.one_min 1 100\n"
-        "g.test.timer.rate.quarter_hour 1 100\n"
-        "g.test.timer.rate.one_hour 1 100\n"
-        "g.test.timer.timings.q50 0 100\n"
-        "g.test.timer.timings.q80 0 100\n"
-        "g.test.timer.timings.q90 0 100\n"
-        "g.test.timer.timings.q95 0 100\n"
-        "g.test.timer.timings.q99 0 100\n",
-        p.result());
+        "g.test.timer.rate.one_sec " + FLOAT_RE + " 100\n"
+        "g.test.timer.rate.one_min " + FLOAT_RE + " 100\n"
+        "g.test.timer.rate.quarter_hour " + FLOAT_RE + " 100\n"
+        "g.test.timer.rate.one_hour " + FLOAT_RE + " 100\n"
+        "g.test.timer.timings.q50 " + FLOAT_RE + " 100\n"
+        "g.test.timer.timings.q80 " + FLOAT_RE + " 100\n"
+        "g.test.timer.timings.q90 " + FLOAT_RE + " 100\n"
+        "g.test.timer.timings.q95 " + FLOAT_RE + " 100\n"
+        "g.test.timer.timings.q99 " + FLOAT_RE + " 100\n"
+    ));
 
     token.finish();
 
     graphite_printer_t p2("g", 100);
     get_root().print(&p2);
 
-    ASSERT_EQ(
-        "g.test.timer.active 0 100\n"
-        "g.test.timer.rate.one_sec 0 100\n"
-        "g.test.timer.rate.one_min 1 100\n"
-        "g.test.timer.rate.quarter_hour 1 100\n"
-        "g.test.timer.rate.one_hour 1 100\n"
-        "g.test.timer.timings.q50 1 100\n"
-        "g.test.timer.timings.q80 1 100\n"
-        "g.test.timer.timings.q90 1 100\n"
-        "g.test.timer.timings.q95 1 100\n"
-        "g.test.timer.timings.q99 1 100\n",
-        p2.result());
+    EXPECT_THAT(p2.result(), MatchesRegex(
+        "g.test.timer.active 0 100\n" // active should be zero
+        "g.test.timer.rate.one_sec " + FLOAT_RE + " 100\n"
+        "g.test.timer.rate.one_min " + FLOAT_RE + " 100\n"
+        "g.test.timer.rate.quarter_hour " + FLOAT_RE + " 100\n"
+        "g.test.timer.rate.one_hour " + FLOAT_RE + " 100\n"
+        "g.test.timer.timings.q50 " + FLOAT_RE + " 100\n"
+        "g.test.timer.timings.q80 " + FLOAT_RE + " 100\n"
+        "g.test.timer.timings.q90 " + FLOAT_RE + " 100\n"
+        "g.test.timer.timings.q95 " + FLOAT_RE + " 100\n"
+        "g.test.timer.timings.q99 " + FLOAT_RE + " 100\n"
+    ));
 }

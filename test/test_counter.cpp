@@ -95,4 +95,10 @@ TEST(histogram_counter_test_t, decay) {
     EXPECT_NEAR(15., qvalues[3], 2);
     EXPECT_NEAR(18., qvalues[4], 2);
     EXPECT_NEAR(21., qvalues[5], 2);
+
+
+	histogram.get_quantiles(now + std::chrono::hours(10), q, &qvalues);
+	for(int i = 0; i < 6; ++i) {
+		EXPECT_EQ(0.0, qvalues[i]);
+	}
 }

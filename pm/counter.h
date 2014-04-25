@@ -136,6 +136,13 @@ public:
         double sum = 0.0;
 
         size_t q = 0;
+        if(total < 1.0) {
+            // histogram is no representative, fill quantiles with zero values
+            for(; q < quantiles.size(); ++q) {
+                (*quantiles_value)[q] = mapping_.unmap(0);
+            }
+        }
+
         for(size_t i = 0; i < histogram_.size() && q < quantiles.size(); ++i) {
             while(q < quantiles.size() && sum  >= quantiles[q] * total) {
                 (*quantiles_value)[q] = mapping_.unmap(i);
