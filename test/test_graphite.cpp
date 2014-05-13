@@ -20,7 +20,7 @@ TEST(graphite_printer_test_t, simple) {
 
     p.child("bar");
     p.start_node();
-    p.child("value");
+    p.child("value.value");
     p.value(0.5);
     p.end_node();
 
@@ -28,6 +28,6 @@ TEST(graphite_printer_test_t, simple) {
 
     ASSERT_EQ(
         "one_min.yandex.foo 10 15\n"
-        "one_min.yandex.bar.value 0.5 15\n",
+        "one_min.yandex.bar.value_value 0.5 15\n",
         p.result());
 }

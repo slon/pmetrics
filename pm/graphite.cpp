@@ -15,6 +15,10 @@ void graphite_printer_t::end_node() { path_.pop_back(); }
 
 void graphite_printer_t::child(const std::string& name) {
     path_.push_back(name);
+
+	for(char& c : path_.back()) {
+		if(c == '.') c = '_';
+	}
 }
 
 void graphite_printer_t::value(double v) {
