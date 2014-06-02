@@ -17,7 +17,6 @@ struct tree_printer_t {
     virtual void value(double value) = 0;
     virtual void value(int64_t value) = 0;
     virtual void value(uint64_t value_) { value(int64_t(value_)); }
-    ;
 
     virtual std::string result() const = 0;
 

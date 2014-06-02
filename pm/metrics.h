@@ -47,6 +47,9 @@ public:
     timer_context_t(timer_t* timer);
     ~timer_context_t() { finish(); }
 
+	timer_context_t(timer_context_t&&) = default;
+	timer_context_t& operator = (timer_context_t&&) = default;
+
     void finish();
 
 private:
@@ -73,7 +76,7 @@ template <class metric_t>
 class named_t {};
 
 class tree_branch_t;
-class tree_printer_t;
+struct tree_printer_t;
 
 // collection of metrics
 class registry_t {
