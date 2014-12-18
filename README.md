@@ -1,8 +1,6 @@
-# pmetrics - C++ библиотека для сбора метрик
+n# pmetrics - C++ library for metrics collection
 
-API и идеи слизаны из java-библиотеки [metrics](http://metrics.codahale.com/).
-
-### Пример использования
+### Example
 
 ```c++
 #include <pm/metrics.h>
