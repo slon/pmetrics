@@ -1,4 +1,4 @@
-n# pmetrics - C++ library for metrics collection
+# pmetrics - C++ library for metrics collection
 
 ### Example
 
